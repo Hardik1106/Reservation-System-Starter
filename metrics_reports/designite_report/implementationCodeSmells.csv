@@ -1,0 +1,21 @@
+Project Name,Package Name,Type Name,Method Name,Code Smell
+java,flight.reservation.order,FlightOrder,processOrderWithPayPal,Complex Conditional
+java,flight.reservation.payment,CreditCard,CreditCard,Magic Number
+java,flight.reservation.flight,Schedule,scheduleFlight,Long Statement
+java,flight.reservation.flight,Schedule,removeFlight,Complex Conditional
+java,flight.reservation.flight,Schedule,removeFlight,Long Statement
+java,flight.reservation.flight,ScheduledFlight,ScheduledFlight,Long Parameter List
+java,flight.reservation.flight,ScheduledFlight,ScheduledFlight,Long Parameter List
+java,flight.reservation.flight,ScheduledFlight,getCrewMemberCapacity,Magic Number
+java,flight.reservation.flight,ScheduledFlight,getCapacity,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Magic Number
+java,flight.reservation.plane,PassengerPlane,PassengerPlane,Missing default
+java,flight.reservation.plane,Helicopter,Helicopter,Magic Number
+java,flight.reservation.plane,Helicopter,Helicopter,Magic Number

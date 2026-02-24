@@ -1,0 +1,16 @@
+Project Name,Package Name,Type Name,Code Smell
+java,flight.reservation.order,Order,Unutilized Abstraction
+java,flight.reservation.order,FlightOrder,Unutilized Abstraction
+java,flight.reservation.order,FlightOrder,Broken Hierarchy
+java,flight.reservation.order,FlightOrder,Cyclic-Dependent Modularization
+java,flight.reservation,Customer,Cyclic-Dependent Modularization
+java,flight.reservation,Passenger,Unutilized Abstraction
+java,flight.reservation.payment,Paypal,Unnecessary Abstraction
+java,flight.reservation.payment,Paypal,Deficient Encapsulation
+java,flight.reservation.flight,ScheduledFlight,Broken Hierarchy
+java,flight.reservation.flight,ScheduledFlight,Missing Hierarchy
+java,flight.reservation.plane,PassengerPlane,Unutilized Abstraction
+java,flight.reservation.plane,PassengerPlane,Deficient Encapsulation
+java,flight.reservation.plane,PassengerDrone,Unutilized Abstraction
+java,flight.reservation.plane,Helicopter,Unutilized Abstraction
+java,(default package),Runner,Unutilized Abstraction

@@ -1,0 +1,137 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+class Runner {
+}
+class Customer {
+  -email : String
+  -name : String
+  -orders : List<Order>
+  +createOrder() : FlightOrder
+  -isOrderValid() : boolean
+  +getEmail() : String
+  +setEmail() : void
+  +getName() : String
+  +setName() : void
+  +getOrders() : List<Order>
+  +setOrders() : void
+}
+class Passenger {
+  -name : final
+  +getName() : String
+}
+class Airport {
+  -name : final
+  -code : final
+  -location : final
+  -flights : List<Flight>
+  -allowedAircrafts : String[]
+  +getName() : String
+  +getCode() : String
+  +getLocation() : String
+  +getFlights() : List<Flight>
+  +setFlights() : void
+  +getAllowedAircrafts() : String[]
+}
+class Order {
+  -id : final
+  -price : double
+  -false : boolean
+  -customer : Customer
+  -passengers : List<Passenger>
+  +getId() : UUID
+  +getPrice() : double
+  +setPrice() : void
+  +getCustomer() : Customer
+  +setCustomer() : void
+  +getPassengers() : List<Passenger>
+  +setPassengers() : void
+  +isClosed() : boolean
+  +setClosed() : void
+}
+class FlightOrder {
+  -flights : final
+  +getScheduledFlights() : List<ScheduledFlight>
+  -isOrderValid() : boolean
+  +processOrderWithCreditCardDetail() : boolean
+  +processOrderWithCreditCard() : boolean
+  -cardIsPresentAndValid() : boolean
+  +processOrderWithPayPal() : boolean
+  +payWithCreditCard() : boolean
+  +payWithPayPal() : boolean
+}
+class CreditCard {
+  -amount : double
+  -number : String
+  -date : Date
+  -cvv : String
+  -valid : boolean
+  +setAmount() : void
+  +getAmount() : double
+  +isValid() : boolean
+  +setValid() : void
+}
+class Paypal {
+}
+class Schedule {
+  -scheduledFlights : List<ScheduledFlight>
+  +getScheduledFlights() : List<ScheduledFlight>
+  +scheduleFlight() : void
+  +removeFlight() : void
+  +removeScheduledFlight() : void
+  +searchScheduledFlight() : ScheduledFlight
+  +clear() : void
+}
+class ScheduledFlight {
+  -passengers : final
+  -departureTime : final
+  -100 : double
+  +getCrewMemberCapacity() : int
+  +addPassengers() : void
+  +removePassengers() : void
+  +getCapacity() : int
+  +getAvailableCapacity() : int
+  +getDepartureTime() : Date
+  +getPassengers() : List<Passenger>
+  +getCurrentPrice() : double
+  +setCurrentPrice() : void
+}
+class Flight {
+  -number : int
+  -departure : Airport
+  -arrival : Airport
+  #aircraft : Object
+  -checkValidity() : void
+  -isAircraftValid() : boolean
+  +getAircraft() : Object
+  +getNumber() : int
+  +getDeparture() : Airport
+  +getArrival() : Airport
+  +toString() : String
+}
+class PassengerPlane {
+  +model : String
+  +passengerCapacity : int
+  +crewCapacity : int
+}
+class PassengerDrone {
+  -model : final
+}
+class Helicopter {
+  -model : final
+  -passengerCapacity : final
+  +getModel() : String
+  +getPassengerCapacity() : int
+}
+
+Customer --> Order
+Airport --> Flight
+Order --> Customer
+Order --> Passenger
+Order <|-- FlightOrder
+Schedule --> ScheduledFlight
+Flight <|-- ScheduledFlight
+Flight --> Airport
+Flight --> Airport
+@enduml
