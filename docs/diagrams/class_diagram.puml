@@ -133,5 +133,4 @@ Order <|-- FlightOrder
 Schedule --> ScheduledFlight
 Flight <|-- ScheduledFlight
 Flight --> Airport
-Flight --> Airport
 @enduml

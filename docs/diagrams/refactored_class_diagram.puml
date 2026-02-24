@@ -1,0 +1,247 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+' --- Original Core Classes ---
+class Customer implements Observer {
+  -email : String
+  -name : String
+  -orders : List<Order>
+  +createOrder() : FlightOrder
+  +getEmail() : String
+  +setEmail() : void
+  +getName() : String
+  +setName() : void
+  +getOrders() : List<Order>
+  +setOrders() : void
+  +update(Observable) : void
+}
+
+class Passenger {
+  -name : String
+  +getName() : String
+}
+
+class Airport {
+  -name : String
+  -code : String
+  -location : String
+  -flights : List<Flight>
+  -allowedAircrafts : String[]
+  +getName() : String
+  +getCode() : String
+  +getLocation() : String
+  +getFlights() : List<Flight>
+  +setFlights() : void
+  +getAllowedAircrafts() : String[]
+}
+
+abstract class Order {
+  -id : UUID
+  -price : double
+  -isClosed : boolean
+  -customer : Customer
+  -passengers : List<Passenger>
+  +getId() : UUID
+  +getPrice() : double
+  +setPrice() : void
+  +getCustomer() : Customer
+  +setCustomer() : void
+  +getPassengers() : List<Passenger>
+  +setPassengers() : void
+  +isClosed() : boolean
+  +setClosed() : void
+}
+
+class FlightOrder extends Order {
+  -flights : List<ScheduledFlight>
+  -paymentStrategy : PaymentStrategy
+  +getScheduledFlights() : List<ScheduledFlight>
+  +setPaymentStrategy(PaymentStrategy) : void
+  +processOrder() : boolean
+}
+
+class Flight {
+  -number : int
+  -departure : Airport
+  -arrival : Airport
+  #aircraft : Aircraft
+  +getAircraft() : Aircraft
+  +getNumber() : int
+  +getDeparture() : Airport
+  +getArrival() : Airport
+  +toString() : String
+}
+
+class ScheduledFlight extends Flight {
+  -passengers : List<Passenger>
+  -departureTime : Date
+  -currentPrice : double
+  +getCrewMemberCapacity() : int
+  +addPassengers() : void
+  +removePassengers() : void
+  +getCapacity() : int
+  +getAvailableCapacity() : int
+  +getDepartureTime() : Date
+  +getPassengers() : List<Passenger>
+  +getCurrentPrice() : double
+  +setCurrentPrice() : void
+}
+
+class Schedule implements Observable {
+  -scheduledFlights : List<ScheduledFlight>
+  -observers : List<Observer>
+  +getScheduledFlights() : List<ScheduledFlight>
+  +scheduleFlight() : void
+  +removeFlight() : void
+  +removeScheduledFlight() : void
+  +searchScheduledFlight() : ScheduledFlight
+  +clear() : void
+  +addObserver(Observer) : void
+  +removeObserver(Observer) : void
+  +notifyObservers() : void
+}
+
+' --- 1. Strategy Pattern (Payment) ---
+interface PaymentStrategy {
+  +executePayment(amount: double): boolean
+}
+
+class CreditCardStrategy implements PaymentStrategy {
+  -card : CreditCard
+  +executePayment(amount: double): boolean
+}
+
+class PaypalStrategy implements PaymentStrategy {
+  -paypal : Paypal
+  +executePayment(amount: double): boolean
+}
+
+class CreditCard {
+  -amount : double
+  -number : String
+  -date : Date
+  -cvv : String
+  -valid : boolean
+  +setAmount() : void
+  +getAmount() : double
+  +isValid() : boolean
+  +setValid() : void
+}
+
+class Paypal {
+}
+
+CreditCardStrategy --> CreditCard
+PaypalStrategy --> Paypal
+FlightOrder o-- PaymentStrategy
+
+' --- 2. Adaptor Pattern (Aircraft) ---
+interface Aircraft {
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+
+class PassengerPlaneAdapter implements Aircraft {
+  -plane : PassengerPlane
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+
+class HelicopterAdapter implements Aircraft {
+  -helicopter : Helicopter
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+
+class PassengerDroneAdapter implements Aircraft {
+  -drone : PassengerDrone
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+
+class PassengerPlane {
+  +model : String
+  +passengerCapacity : int
+  +crewCapacity : int
+}
+
+class PassengerDrone {
+  -model : String
+}
+
+class Helicopter {
+  -model : String
+  -passengerCapacity : int
+  +getModel() : String
+  +getPassengerCapacity() : int
+}
+
+PassengerPlaneAdapter --> PassengerPlane
+HelicopterAdapter --> Helicopter
+PassengerDroneAdapter --> PassengerDrone
+Flight o-- Aircraft
+
+' --- 3. Factory Pattern (AircraftFactory) ---
+class AircraftFactory {
+  +createAircraft(type: String, model: String) : Aircraft
+}
+AircraftFactory ..> Aircraft : creates
+
+' --- 4. Builder Pattern (FlightOrderBuilder) ---
+class FlightOrderBuilder {
+  -customer : Customer
+  -passengers : List<Passenger>
+  -flights : List<ScheduledFlight>
+  +withCustomer(Customer) : FlightOrderBuilder
+  +addPassenger(Passenger) : FlightOrderBuilder
+  +addScheduledFlight(ScheduledFlight) : FlightOrderBuilder
+  +build() : FlightOrder
+}
+FlightOrderBuilder ..> FlightOrder : builds
+
+' --- 5. Chain of Responsibility Pattern (OrderValidator) ---
+abstract class OrderValidator {
+  -next : OrderValidator
+  +setNext(OrderValidator) : void
+  +validate(FlightOrder) : boolean
+}
+
+class AircraftValidityHandler extends OrderValidator {
+  +validate(FlightOrder) : boolean
+}
+
+class PassengerCapacityHandler extends OrderValidator {
+  +validate(FlightOrder) : boolean
+}
+
+class PaymentMethodHandler extends OrderValidator {
+  +validate(FlightOrder) : boolean
+}
+
+FlightOrder --> OrderValidator
+
+' --- 6. Observer Pattern (Schedule Updates) ---
+interface Observable {
+  +addObserver(Observer) : void
+  +removeObserver(Observer) : void
+  +notifyObservers() : void
+}
+
+interface Observer {
+  +update(Observable) : void
+}
+
+' Relations
+Customer --> Order
+Airport --> Flight
+Order --> Customer
+Order --> Passenger
+Schedule --> ScheduledFlight
+Flight --> Airport
+
+@enduml
