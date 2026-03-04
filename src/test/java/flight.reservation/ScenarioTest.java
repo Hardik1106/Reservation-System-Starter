@@ -5,8 +5,9 @@ import flight.reservation.flight.Schedule;
 import flight.reservation.flight.ScheduledFlight;
 import flight.reservation.order.FlightOrder;
 import flight.reservation.payment.CreditCard;
-import flight.reservation.plane.Helicopter;
-import flight.reservation.plane.PassengerPlane;
+import flight.reservation.payment.CreditCardStrategy;
+import flight.reservation.payment.PaypalStrategy;
+import flight.reservation.plane.AircraftFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Scenario Tests")
 public class ScenarioTest {
-
 
     private Schedule schedule;
     private Customer customer;
@@ -50,14 +50,18 @@ public class ScenarioTest {
 
             @BeforeEach
             public void initFlights() {
-                startAirport = new Airport("John F. Kennedy International Airport", "JFK", "Queens, New York, New York");
-                destinationAirport = new Airport("Frankfurt Airport", "FRA", "Frankfurt, Hesse", new String[]{"A380", "A350"});
+                startAirport = new Airport("John F. Kennedy International Airport", "JFK",
+                        "Queens, New York, New York");
+                destinationAirport = new Airport("Frankfurt Airport", "FRA", "Frankfurt, Hesse",
+                        new String[] { "A380", "A350" });
             }
 
             @Test
             @DisplayName("then the flight should not be available")
             void thenFlightNotAvailable() {
-                assertThrows(IllegalArgumentException.class, () -> new Flight(1, startAirport, destinationAirport, new Helicopter("H1")));
+                assertThrows(IllegalArgumentException.class,
+                        () -> new Flight(1, startAirport, destinationAirport,
+                                AircraftFactory.createAircraft("Helicopter", "H1")));
             }
 
         }
@@ -68,13 +72,14 @@ public class ScenarioTest {
 
             @BeforeEach
             public void initFlights() {
-                startAirport = new Airport("John F. Kennedy International Airport", "JFK", "Queens, New York, New York");
+                startAirport = new Airport("John F. Kennedy International Airport", "JFK",
+                        "Queens, New York, New York");
                 destinationAirport = new Airport("Frankfurt Airport", "FRA", "Frankfurt, Hesse");
-                flight = new Flight(1, startAirport, destinationAirport, new Helicopter("H1"));
+                flight = new Flight(1, startAirport, destinationAirport,
+                        AircraftFactory.createAircraft("Helicopter", "H1"));
                 Date departure = TestUtil.addDays(Date.from(Instant.now()), 3);
                 schedule.scheduleFlight(flight, departure);
             }
-
 
             @Nested
             @DisplayName("and the H1 is fully booked")
@@ -94,12 +99,15 @@ public class ScenarioTest {
                 @DisplayName("then the booking should be stopped and the payment should not proceed and the capacity should be unchanged")
                 void thenTheBookingShouldBeStopped() throws NoSuchFieldException {
                     ScheduledFlight scheduledFlight = schedule.searchScheduledFlight(flight.getNumber());
-                    assertThrows(IllegalStateException.class, () -> customer.createOrder(Arrays.asList("Amanda", "Max"), Arrays.asList(scheduledFlight), 180));
+                    assertThrows(IllegalStateException.class, () -> customer.createOrder(Arrays.asList("Amanda", "Max"),
+                            Arrays.asList(scheduledFlight), 180));
                     assertEquals(3, scheduledFlight.getPassengers().size());
                     assertEquals(4, scheduledFlight.getCapacity());
                     assertEquals(1, scheduledFlight.getAvailableCapacity());
-                    assertTrue(scheduledFlight.getPassengers().stream().noneMatch(passenger -> passenger.getName().equals("Max")));
-                    assertTrue(scheduledFlight.getPassengers().stream().noneMatch(passenger -> passenger.getName().equals("Amanda")));
+                    assertTrue(scheduledFlight.getPassengers().stream()
+                            .noneMatch(passenger -> passenger.getName().equals("Max")));
+                    assertTrue(scheduledFlight.getPassengers().stream()
+                            .noneMatch(passenger -> passenger.getName().equals("Amanda")));
                 }
             }
 
@@ -110,17 +118,21 @@ public class ScenarioTest {
                 @DisplayName("then the booking should succeed")
                 void thenTheBookingShouldSucceed() throws NoSuchFieldException {
                     ScheduledFlight scheduledFlight = schedule.searchScheduledFlight(flight.getNumber());
-                    FlightOrder order = customer.createOrder(Arrays.asList("Amanda", "Max"), Arrays.asList(scheduledFlight), 180);
+                    FlightOrder order = customer.createOrder(Arrays.asList("Amanda", "Max"),
+                            Arrays.asList(scheduledFlight), 180);
 
                     assertEquals(2, scheduledFlight.getPassengers().size());
                     assertEquals(4, scheduledFlight.getCapacity());
                     assertEquals(2, scheduledFlight.getAvailableCapacity());
-                    assertTrue(scheduledFlight.getPassengers().stream().anyMatch(passenger -> passenger.getName().equals("Max")));
-                    assertTrue(scheduledFlight.getPassengers().stream().anyMatch(passenger -> passenger.getName().equals("Amanda")));
+                    assertTrue(scheduledFlight.getPassengers().stream()
+                            .anyMatch(passenger -> passenger.getName().equals("Max")));
+                    assertTrue(scheduledFlight.getPassengers().stream()
+                            .anyMatch(passenger -> passenger.getName().equals("Amanda")));
                     assertFalse(order.isClosed());
                     assertEquals(order, customer.getOrders().get(0));
 
-                    boolean isProcessed = order.processOrderWithPayPal(customer.getEmail(), "amanda1985");
+                    boolean isProcessed = order
+                            .processOrderWithStrategy(new PaypalStrategy(customer.getEmail(), "amanda1985"));
                     assertTrue(isProcessed);
                     assertTrue(order.isClosed());
                 }
@@ -138,7 +150,8 @@ public class ScenarioTest {
             // flights
             startAirport = new Airport("Berlin Airport", "BER", "Berlin, Berlin");
             destinationAirport = new Airport("Frankfurt Airport", "FRA", "Frankfurt, Hesse");
-            flight = new Flight(1, startAirport, destinationAirport, new PassengerPlane("A380"));
+            flight = new Flight(1, startAirport, destinationAirport,
+                    AircraftFactory.createAircraft("PassengerPlane", "A380"));
             Date departure = TestUtil.addDays(Date.from(Instant.now()), 3);
             schedule.scheduleFlight(flight, departure);
             // customer
@@ -161,7 +174,8 @@ public class ScenarioTest {
             void thenThePaymentAndBookingShouldNotSucceed() {
                 ScheduledFlight scheduledFlight = schedule.searchScheduledFlight(flight.getNumber());
                 FlightOrder order = customer.createOrder(Arrays.asList("Max"), Arrays.asList(scheduledFlight), 100);
-                assertThrows(IllegalStateException.class, () -> order.processOrderWithCreditCard(creditCard));
+                assertThrows(IllegalStateException.class,
+                        () -> order.processOrderWithStrategy(new CreditCardStrategy(creditCard)));
                 assertFalse(order.isClosed());
             }
         }
@@ -180,7 +194,8 @@ public class ScenarioTest {
             void thenTheBookingShouldNotSucceed() {
                 ScheduledFlight scheduledFlight = schedule.searchScheduledFlight(flight.getNumber());
                 FlightOrder order = customer.createOrder(Arrays.asList("Max"), Arrays.asList(scheduledFlight), 100);
-                assertThrows(IllegalStateException.class, () -> order.processOrderWithCreditCard(creditCard));
+                assertThrows(IllegalStateException.class,
+                        () -> order.processOrderWithStrategy(new CreditCardStrategy(creditCard)));
                 assertFalse(order.isClosed());
             }
         }
@@ -200,7 +215,7 @@ public class ScenarioTest {
             void thenTheBookingShouldSucceed() throws NoSuchFieldException {
                 ScheduledFlight scheduledFlight = schedule.searchScheduledFlight(flight.getNumber());
                 FlightOrder order = customer.createOrder(Arrays.asList("Max"), Arrays.asList(scheduledFlight), 100);
-                boolean processed = order.processOrderWithCreditCard(creditCard);
+                boolean processed = order.processOrderWithStrategy(new CreditCardStrategy(creditCard));
                 assertTrue(processed);
                 assertTrue(order.isClosed());
                 assertEquals(order, customer.getOrders().get(0));
@@ -213,6 +228,5 @@ public class ScenarioTest {
             }
         }
     }
-
 
 }

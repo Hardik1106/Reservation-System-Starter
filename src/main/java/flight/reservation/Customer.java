@@ -21,36 +21,31 @@ public class Customer {
     }
 
     public FlightOrder createOrder(List<String> passengerNames, List<ScheduledFlight> flights, double price) {
-        if (!isOrderValid(passengerNames, flights)) {
+        flight.reservation.order.OrderValidator validator = new flight.reservation.order.CustomerNoFlyListValidator();
+        validator.setNext(new flight.reservation.order.PassengerNoFlyListValidator())
+                .setNext(new flight.reservation.order.CapacityValidator());
+
+        if (!validator.isValid(this, passengerNames, flights)) {
             throw new IllegalStateException("Order is not valid");
         }
-        FlightOrder order = new FlightOrder(flights);
-        order.setCustomer(this);
-        order.setPrice(price);
         List<Passenger> passengers = passengerNames
                 .stream()
                 .map(Passenger::new)
                 .collect(Collectors.toList());
-        order.setPassengers(passengers);
+
+        FlightOrder order = new flight.reservation.order.FlightOrderBuilder()
+                .setFlights(flights)
+                .setCustomer(this)
+                .setPrice(price)
+                .setPassengers(passengers)
+                .build();
+
         order.getScheduledFlights().forEach(scheduledFlight -> scheduledFlight.addPassengers(passengers));
         orders.add(order);
         return order;
     }
 
-    private boolean isOrderValid(List<String> passengerNames, List<ScheduledFlight> flights) {
-        boolean valid = true;
-        valid = valid && !FlightOrder.getNoFlyList().contains(this.getName());
-        valid = valid && passengerNames.stream().noneMatch(passenger -> FlightOrder.getNoFlyList().contains(passenger));
-        valid = valid && flights.stream().allMatch(scheduledFlight -> {
-            try {
-                return scheduledFlight.getAvailableCapacity() >= passengerNames.size();
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-                return false;
-            }
-        });
-        return valid;
-    }
+    // Removed isOrderValid as it's replaced by OrderValidator chain
 
     public String getEmail() {
         return email;
