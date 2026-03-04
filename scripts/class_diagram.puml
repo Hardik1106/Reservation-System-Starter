@@ -1,0 +1,225 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+class Runner {
+  #schedule : Schedule
+  +main(String[] args) : static void
+}
+class Airport {
+  -name : String
+  -code : String
+  -location : String
+  -flights : List<Flight>
+  -allowedAircrafts : String[]
+  +getName() : String
+  +getCode() : String
+  +getLocation() : String
+  +getFlights() : List<Flight>
+  +setFlights(List<Flight> flights) : void
+  +getAllowedAircrafts() : String[]
+}
+class Customer {
+  -email : String
+  -name : String
+  -orders : List<Order>
+  +createOrder(List<String> passengerNames, List<ScheduledFlight> flights, double price) : FlightOrder
+  +getEmail() : String
+  +setEmail(String email) : void
+  +getName() : String
+  +setName(String name) : void
+  +getOrders() : List<Order>
+  +setOrders(List<Order> orders) : void
+}
+class Passenger {
+  -name : String
+  +getName() : String
+}
+class Flight {
+  -number : int
+  -departure : Airport
+  -arrival : Airport
+  #aircraft : Aircraft
+  -checkValidity() : void
+  -isAircraftValid(Airport airport) : boolean
+  +getAircraft() : Aircraft
+  +getNumber() : int
+  +getDeparture() : Airport
+  +getArrival() : Airport
+  +toString() : String
+}
+interface Observer {
+  +update(ScheduledFlight flight, String action) : void
+}
+class Schedule {
+  -scheduledFlights : List<ScheduledFlight>
+  -observers : List<Observer>
+  +addObserver(Observer observer) : void
+  +removeObserver(Observer observer) : void
+  -notifyObservers(ScheduledFlight flight, String action) : void
+  +getScheduledFlights() : List<ScheduledFlight>
+  +scheduleFlight(Flight flight, Date date) : void
+  +removeFlight(Flight flight) : void
+  +removeScheduledFlight(ScheduledFlight flight) : void
+  +searchScheduledFlight(int flightNumber) : ScheduledFlight
+  +clear() : void
+}
+class ScheduledFlight {
+  -passengers : List<Passenger>
+  -departureTime : Date
+  -currentPrice : double
+  +getCrewMemberCapacity() : int
+  +addPassengers(List<Passenger> passengers) : void
+  +removePassengers(List<Passenger> passengers) : void
+  +getCapacity() : int
+  +getAvailableCapacity() : int
+  +getDepartureTime() : Date
+  +getPassengers() : List<Passenger>
+  +getCurrentPrice() : double
+  +setCurrentPrice(double currentPrice) : void
+}
+class CapacityValidator {
+  #check(Customer customer, List<String> passengerNames, List<ScheduledFlight> flights) : boolean
+}
+class CustomerNoFlyListValidator {
+  #check(Customer customer, List<String> passengerNames, List<ScheduledFlight> flights) : boolean
+}
+class FlightOrder {
+  -flights : List<ScheduledFlight>
+  #noFlyList : List<String>
+  +getNoFlyList() : static List<String>
+  +getScheduledFlights() : List<ScheduledFlight>
+  +processOrderWithStrategy(PaymentStrategy strategy) : boolean
+}
+class FlightOrderBuilder {
+  -flights : List<ScheduledFlight>
+  -customer : Customer
+  -price : double
+  -passengers : List<Passenger>
+  +setFlights(List<ScheduledFlight> flights) : FlightOrderBuilder
+  +setCustomer(Customer customer) : FlightOrderBuilder
+  +setPrice(double price) : FlightOrderBuilder
+  +setPassengers(List<Passenger> passengers) : FlightOrderBuilder
+  +build() : FlightOrder
+}
+class Order {
+  -id : UUID
+  -price : double
+  -isClosed : boolean
+  -customer : Customer
+  -passengers : List<Passenger>
+  +getId() : UUID
+  +getPrice() : double
+  +setPrice(double price) : void
+  +getCustomer() : Customer
+  +setCustomer(Customer customer) : void
+  +getPassengers() : List<Passenger>
+  +setPassengers(List<Passenger> passengers) : void
+  +isClosed() : boolean
+  +setClosed() : void
+}
+class OrderValidator {
+  -next : OrderValidator
+  +setNext(OrderValidator next) : OrderValidator
+  +isValid(Customer customer, List<String> passengerNames, List<ScheduledFlight> flights) : boolean
+  #check(Customer customer, List<String> passengerNames, List<ScheduledFlight> flights) : abstract boolean
+}
+class PassengerNoFlyListValidator {
+  #check(Customer customer, List<String> passengerNames, List<ScheduledFlight> flights) : boolean
+}
+class CreditCard {
+  -amount : double
+  -number : String
+  -date : Date
+  -cvv : String
+  -valid : boolean
+  +setAmount(double amount) : void
+  +getAmount() : double
+  +isValid() : boolean
+  +setValid() : void
+}
+class CreditCardStrategy {
+  -creditCard : CreditCard
+  +pay(double amount) : boolean
+}
+interface PaymentStrategy {
+  +pay(double amount) : boolean
+}
+class Paypal {
+  +DATA_BASE : Map<String, String>
+}
+class PaypalStrategy {
+  -email : String
+  -password : String
+  +pay(double amount) : boolean
+}
+interface Aircraft {
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+class AircraftFactory {
+  +createAircraft(String type, String model) : static Aircraft
+}
+class Helicopter {
+  -model : String
+  -passengerCapacity : int
+  +getModel() : String
+  +getPassengerCapacity() : int
+}
+class HelicopterAdapter {
+  -helicopter : Helicopter
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+class PassengerDrone {
+  -model : String
+}
+class PassengerDroneAdapter {
+  -drone : PassengerDrone
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+class PassengerPlane {
+  +model : String
+  +passengerCapacity : int
+  +crewCapacity : int
+}
+class PassengerPlaneAdapter {
+  -plane : PassengerPlane
+  +getModel() : String
+  +getPassengerCapacity() : int
+  +getCrewCapacity() : int
+}
+
+Runner --> Schedule
+Airport --> Flight
+Customer --> Order
+Flight --> Airport
+Flight --> Aircraft
+Schedule --> ScheduledFlight
+Schedule --> Observer
+Flight <|-- ScheduledFlight
+ScheduledFlight --> Passenger
+OrderValidator <|-- CapacityValidator
+OrderValidator <|-- CustomerNoFlyListValidator
+Order <|-- FlightOrder
+FlightOrder --> ScheduledFlight
+FlightOrderBuilder --> ScheduledFlight
+FlightOrderBuilder --> Customer
+FlightOrderBuilder --> Passenger
+Order --> Customer
+Order --> Passenger
+OrderValidator <|-- PassengerNoFlyListValidator
+PaymentStrategy <|.. CreditCardStrategy
+CreditCardStrategy --> CreditCard
+PaymentStrategy <|.. PaypalStrategy
+Aircraft <|.. HelicopterAdapter
+HelicopterAdapter --> Helicopter
+Aircraft <|.. PassengerDroneAdapter
+PassengerDroneAdapter --> PassengerDrone
+Aircraft <|.. PassengerPlaneAdapter
+PassengerPlaneAdapter --> PassengerPlane
+@enduml
