@@ -1,0 +1,22 @@
+Project Name,Package Name,Type Name,Code Smell
+java,flight.reservation.order,PassengerNoFlyListValidator,Unutilized Abstraction
+java,flight.reservation.order,Order,Unutilized Abstraction
+java,flight.reservation.order,FlightOrder,Unutilized Abstraction
+java,flight.reservation.order,FlightOrder,Broken Hierarchy
+java,flight.reservation.order,OrderValidator,Cyclic-Dependent Modularization
+java,flight.reservation.order,CapacityValidator,Unutilized Abstraction
+java,flight.reservation.order,CustomerNoFlyListValidator,Unutilized Abstraction
+java,flight.reservation.order,FlightOrderBuilder,Unutilized Abstraction
+java,flight.reservation,Customer,Cyclic-Dependent Modularization
+java,flight.reservation,Passenger,Unutilized Abstraction
+java,flight.reservation.payment,PaypalStrategy,Unutilized Abstraction
+java,flight.reservation.payment,CreditCardStrategy,Unutilized Abstraction
+java,flight.reservation.payment,Paypal,Unnecessary Abstraction
+java,flight.reservation.payment,Paypal,Deficient Encapsulation
+java,flight.reservation.flight,ScheduledFlight,Broken Hierarchy
+java,flight.reservation.plane,HelicopterAdapter,Unutilized Abstraction
+java,flight.reservation.plane,PassengerPlaneAdapter,Unutilized Abstraction
+java,flight.reservation.plane,AircraftFactory,Unutilized Abstraction
+java,flight.reservation.plane,PassengerPlane,Deficient Encapsulation
+java,flight.reservation.plane,PassengerDroneAdapter,Unutilized Abstraction
+java,(default package),Runner,Unutilized Abstraction
